@@ -1,7 +1,7 @@
 import os
 import re
 
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from werkzeug.exceptions import BadRequest
 
 app = Flask(__name__)
@@ -12,23 +12,22 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 
 def do_cmd(cmd: str, value: str, data: list[str]) -> list:
     if cmd == 'filter':
-        result = list(filter(lambda record: value in record, data))
+        return list(filter(lambda record: value in record, data))
     elif cmd == 'map':
         col_num = int(value)
-        result = list(map(lambda record: record.split()[col_num], data))
+        return list(map(lambda record: record.split()[col_num], data))
     elif cmd == 'unique':
-        result = list(set(data))
+        return list(set(data))
     elif cmd == 'sort':
         reverse = value == 'desc'
-        result = list(sorted(data, reverse=reverse))
+        return list(sorted(data, reverse=reverse))
     elif cmd == 'limit':
-        result = data[:int(value)]
+        return data[:int(value)]
     elif cmd == 'regex':
         regex = re.compile(value)
-        result = filter(lambda v: re.search(regex, v), data)
+        return list(filter(lambda v: re.search(regex, v), data))
     else:
         raise BadRequest
-    return result
 
 
 def do_query(params: dict) -> list:
